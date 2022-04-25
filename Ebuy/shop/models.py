@@ -1,5 +1,4 @@
 from django.db import models
-
 # Create your models here.
 class Product(models.Model):
     product_id=models.AutoField
@@ -25,7 +24,6 @@ class Contact(models.Model):
     desc = models.CharField(max_length=500, default="")
     def __str__(self):
         return self.name
-
 class Orders(models.Model):
     order_id = models.AutoField(primary_key=True)
     items_json = models.CharField(max_length=5000)
