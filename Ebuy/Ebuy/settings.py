@@ -64,7 +64,7 @@ WSGI_APPLICATION = 'Ebuy.wsgi.application'
 DATABASES = {
 'default': {
 'ENGINE': 'django.db.backends.mysql',
-'NAME': 'ebuy',
+'NAME': 'lms',
 'USER': 'root',
 'PASSWORD': "",
 'HOST': "",
