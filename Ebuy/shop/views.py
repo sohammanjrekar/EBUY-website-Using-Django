@@ -1,23 +1,59 @@
 from django.shortcuts import render
-from .models import Product, Contact, Orders, OrderUpdate
+
+from shop.recomadation import collaborative_filtering_recommendation, content_based_recommendation
+from .models import Product, Contact, Orders, OrderUpdate, UserActivity
 from math import ceil
 import json
 
 # Create your views here.
 from django.http import HttpResponse
 MERCHANT_KEY = 'Your-Merchant-Key-Here'
+from django.db.models import Count
+
+from collections import defaultdict
+from django.db.models import Count
 
 def index(request):
+    allDepartments = []
+    allCategories = {}
+    allSubcategories = {}
     allProds = []
-    catprods = Product.objects.values('sub_category', 'id')
-    cats = {item['sub_category'] for item in catprods}
-    for cat in cats:
-        prod = Product.objects.filter(sub_category=cat)
-        n = len(prod)
-        nSlides = n // 4 + ceil((n / 4) - (n // 4))
-        allProds.append([prod, range(1, nSlides), nSlides])
-    params = {'allProds':allProds}
+
+    # Fetch distinct departments
+    departments = Product.objects.values_list('department', flat=True).distinct()
+
+    for department in departments:
+        allDepartments.append(department)
+
+        # Fetch distinct categories for the department
+        categories = Product.objects.filter(department=department).values_list('category', flat=True).distinct()
+
+        # Fetch distinct subcategories for each category in the department
+        subcategories_dict = {}
+        for category in categories:
+            subcategories = Product.objects.filter(department=department, category=category).values_list('sub_category', flat=True).distinct()
+            subcategories_dict[category] = list(subcategories)
+        allSubcategories[department] = subcategories_dict
+
+        # Fetch products for each department and category
+        for category in categories:
+            products = Product.objects.filter(department=department, category=category)
+            nSlides = len(products) // 4 + ceil((len(products) / 4) - (len(products) // 4))
+            ranges = range(1, nSlides)
+            allProds.append((department, category, products, ranges, nSlides))
+
+    params = {
+        'allDepartments': allDepartments,
+        'allCategories': allCategories,
+        'allSubcategories': allSubcategories,
+        'allProds': allProds,
+    }
     return render(request, 'shop/index.html', params)
+
+
+
+
+
 
 def searchMatch(query, item):
     '''return true only if query matches the item'''
@@ -108,22 +144,27 @@ def checkout(request):
         thank = True
         id = order.order_id
         return render(request, 'shop/checkout.html', {'thank':thank, 'id': id})
-        # Request paytm to transfer the amount to your account after payment by user
-        param_dict = {
-
-                'MID': 'Your-Merchant-Id-Here',
-                'ORDER_ID': str(order.order_id),
-                'TXN_AMOUNT': str(amount),
-                'CUST_ID': email,
-                'INDUSTRY_TYPE_ID': 'Retail',
-                'WEBSITE': 'WEBSTAGING',
-                'CHANNEL_ID': 'WEB',
-                'CALLBACK_URL':'http://127.0.0.1:8000/shop/handlerequest/',
-
-        }
-        param_dict['CHECKSUMHASH'] = Checksum.generate_checksum(param_dict, MERCHANT_KEY)
-        return render(request, 'shop/paytm.html', {'param_dict': param_dict})
+        
 
     return render(request, 'shop/checkout.html')
 
 
+def recommended_products(request):
+    user = request.user
+    
+    # Get recommendations using content-based approach
+    content_based_recommendations = content_based_recommendation(user)
+    
+    # Get recommendations using collaborative filtering approach
+    collaborative_filtering_recommendations = collaborative_filtering_recommendation(user)
+    
+    return render(request, 'shop/recommended_products.html', {'content_based_recommendations': content_based_recommendations, 'collaborative_filtering_recommendations': collaborative_filtering_recommendations})
+from django.contrib.auth.decorators import login_required
+
+@login_required
+def track_activity(request, activity_type, product_id):
+    user = request.user
+    product = Product.objects.get(pk=product_id)
+    activity = UserActivity(user=user, activity_type=activity_type, product=product)
+    activity.save()
+    return HttpResponse("Activity tracked successfully.")

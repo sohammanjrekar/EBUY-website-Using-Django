@@ -1,9 +1,10 @@
 from django.db import models
+from django.contrib.auth.models import User
 # Create your models here.
 class Product(models.Model):
     product_id=models.AutoField
     product_name=models.CharField(max_length=50)
-    Department=models.CharField(max_length=50, default="")
+    department=models.CharField(max_length=50, default="")
     category=models.CharField(max_length=50, default="")
     sub_category=models.CharField(max_length=50, default="")
     price=models.IntegerField(default=0)
@@ -11,7 +12,7 @@ class Product(models.Model):
     publish_date=models.DateField(default=0)
     seller_info=models.CharField(max_length=50, default="")
     availability=models.BooleanField(default=True)
-    Image=models.ImageField(upload_to="shop/images/")
+    image=models.ImageField(upload_to="shop/images/")
     def __str__(self):
         return self.product_name
 
@@ -45,3 +46,11 @@ class OrderUpdate(models.Model):
     def __str__(self):
         return self.update_desc[0:7] + "..."
 
+class UserActivity(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    activity_type = models.CharField(max_length=50)  # e.g., search, view, save, like, buy
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.activity_type} - {self.product.product_name}"

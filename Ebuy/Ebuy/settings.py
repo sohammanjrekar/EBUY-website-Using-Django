@@ -60,18 +60,14 @@ WSGI_APPLICATION = 'Ebuy.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
-
 DATABASES = {
 'default': {
 'ENGINE': 'django.db.backends.mysql',
-'NAME': 'lms',
+'NAME': 'ebuy',
 'USER': 'root',
-'PASSWORD': "",
-'HOST': "",
-'PORT': "",
-'OPTIONS': {
-'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
-}
+'PASSWORD': '',
+'HOST':'localhost',
+'PORT':'3306',
 }
 }
 
