@@ -55,3 +55,11 @@ def checkout(request):
     order.save()
 
     return Response({"order_id": order.razorpay_order_id, "total_amount": total_amount})
+
+@api_view(['GET'])
+def product_detail(request, slug):
+    product = Product.objects.get(slug=slug)
+    return Response({
+        "name": product.name,
+        "carousel_images": product.carousel_images,
+    })
