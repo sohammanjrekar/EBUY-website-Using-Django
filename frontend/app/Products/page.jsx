@@ -6,7 +6,6 @@ const page = () => {
   return (
     <>
     <Navbar/>
-    {/* source: https://github.com/mfg888/Responsive-Tailwind-CSS-Grid/blob/main/index.html */}
     <div className="text-center p-10">
       <h1 className="font-bold text-4xl mb-4">Responsive Product card grid</h1>
       <h1 className="text-3xl">Tailwind CSS</h1>
@@ -41,7 +40,7 @@ const page = () => {
                   xmlns="http://www.w3.org/2000/svg"
                   width={20}
                   height={20}
-                  fill="currentColor"
+                  fill="grey"
                   className="bi bi-bag-plus"
                   viewBox="0 0 16 16"
                 >
