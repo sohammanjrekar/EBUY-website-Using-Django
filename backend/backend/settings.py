@@ -1,18 +1,28 @@
 import os
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SECRET_KEY = '!f%#0g@n&75(y30x6ib!&y!2lrnoyl0+h96gazk3$)u=zodu9t'
+from pathlib import Path
+BASE_DIR = Path(__file__).resolve().parent.parent
+SECRET_KEY = 'django-insecure-v=*i93r_8&t6v#o6-w35x^0u6*j!wb1tz-4yb+xc6qzy91%cf@'
 DEBUG = True
 ALLOWED_HOSTS = []
+
+
+# Application definition
+
 INSTALLED_APPS = [
-    'shop.apps.ShopConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
+    'corsheaders',
+    'store',
 ]
+
+CORS_ALLOW_ALL_ORIGINS = True
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -21,7 +31,9 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
-ROOT_URLCONF = 'Ebuy.urls'
+
+ROOT_URLCONF = 'backend.urls'
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -37,18 +49,24 @@ TEMPLATES = [
         },
     },
 ]
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-WSGI_APPLICATION = 'Ebuy.wsgi.application'
+
+WSGI_APPLICATION = 'backend.wsgi.application'
+
 DATABASES = {
 'default': {
 'ENGINE': 'django.db.backends.mysql',
-'NAME': 'ebuy',
+'NAME': 'ebuydb',
 'USER': 'root',
 'PASSWORD': '1234',
 'HOST':'localhost',
 'PORT':'3306',
 }
 }
+
+
+# Password validation
+# https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
+
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -63,11 +81,21 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+
+# Internationalization
+# https://docs.djangoproject.com/en/5.1/topics/i18n/
+
 LANGUAGE_CODE = 'en-us'
+
 TIME_ZONE = 'UTC'
+
 USE_I18N = True
-USE_L10N = True
+
 USE_TZ = True
-STATIC_URL = '/static/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+
+STATIC_URL = 'static/'
 MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
